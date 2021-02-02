@@ -1,6 +1,10 @@
 defmodule Servy.Handler do
   require Logger
 
+  import Servy.FileHandler, only: [handle_file: 2]
+  import Servy.Parser, only: [parse: 1]
+  import Servy.Plugins, only: [track: 1, rewrite_path: 1, log: 1]
+
   def handle(request) do
     request
     |> parse()
@@ -8,56 +12,7 @@ defmodule Servy.Handler do
     |> log
     |> route()
     |> track()
-    # |> emojify()
     |> format_response()
-  end
-
-  # Thought Experiment: other useful function?
-  # check if user is authenticated, check if the url is valid
-  def emojify(%{status: 200} = conv) do
-    %{conv | resp_body: "🚀 #{conv.resp_body} 🚀"}
-  end
-
-  def emojify(conv), do: conv
-
-  def track(%{status: 404, path: path} = conv) do
-    Logger.info("You got a 404")
-    IO.puts("Warning #{path} is on the loose!")
-    conv
-  end
-
-  def track(conv), do: conv
-
-  def rewrite_path(%{path: path} = conv) do
-    regex = ~r{\/(?<animal>\w+)\?id=(?<id>\d+)}
-    captures = Regex.named_captures(regex, path)
-    rewrite_path_captures(conv, captures)
-  end
-
-  def rewrite_path(conv), do: conv
-
-  @spec rewrite_path_captures(any, nil | map) :: any
-  def rewrite_path_captures(conv, %{"animal" => animal, "id" => id}) do
-    %{conv | path: "/#{animal}/#{id}"}
-  end
-
-  def rewrite_path_captures(conv, nil), do: conv
-
-  def log(conv), do: IO.inspect(conv)
-
-  def parse(request) do
-    [method, path, _version] =
-      request
-      |> String.split("\n")
-      |> List.first()
-      |> String.split(" ")
-
-    %{
-      method: method,
-      path: path,
-      resp_body: "",
-      status: nil
-    }
   end
 
   def route(%{method: "GET", path: "/wildthings"} = conv) do
@@ -93,18 +48,6 @@ defmodule Servy.Handler do
 
   def route(%{path: path} = conv) do
     %{conv | status: 404, resp_body: "No #{path} here!"}
-  end
-
-  def handle_file({:ok, content}, conv) do
-    %{conv | status: 200, resp_body: "#{content}"}
-  end
-
-  def handle_file({:error, :enoent}, conv) do
-    %{conv | status: 404, resp_body: "File not found"}
-  end
-
-  def handle_file({:error, reason}, conv) do
-    %{conv | status: 500, resp_body: "Error: #{reason}"}
   end
 
   def format_response(conv) do
