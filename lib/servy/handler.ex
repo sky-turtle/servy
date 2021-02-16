@@ -20,7 +20,19 @@ defmodule Servy.Handler do
     |> log
     |> route()
     |> track()
+    |> put_content_length()
     |> format_response()
+  end
+
+  def put_content_length(conv) do
+    content_length =
+      conv.resp_body
+      |> String.length()
+
+    new_headers = Map.put(conv.resp_headers, "Content-Length", content_length)
+
+    IO.inspect(new_headers)
+    %{conv | resp_headers: new_headers}
   end
 
   def route(%Conv{method: "GET", path: "/wildthings"} = conv) do
@@ -62,8 +74,8 @@ defmodule Servy.Handler do
   def format_response(%Conv{} = conv) do
     """
     HTTP/1.1 #{Conv.full_status(conv)}\r
-    Content-Type: #{conv.resp_content_type}\r
-    Content-Length: #{String.length(conv.resp_body)}\r
+    Content-Type: #{conv.resp_headers["Content-Type"]}\r
+    Content-Length: #{conv.resp_headers["Content-Length"]}\r
     \r
     #{conv.resp_body}
     """
