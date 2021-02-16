@@ -10,4 +10,11 @@ defmodule Servy.FileHandler do
   def handle_file({:error, reason}, conv) do
     %{conv | status: 500, resp_body: "Error: #{reason}"}
   end
+
+  def my_adder(x, y) do
+    x + y
+  end
+
+  def another_adder(x, y) do
+    end 
 end
