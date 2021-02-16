@@ -1,5 +1,5 @@
 defmodule HandlerTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Servy.Handler, only: [handle: 1]
 
@@ -173,6 +173,26 @@ defmodule HandlerTest do
            Content-Length: 33\r
            \r
            Created a Brown bear named Baloo!
+           """
+  end
+
+  test "DELETE bear" do
+    request = """
+    DELETE /bears/1 HTTP/1.1\r
+    Host: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    \r
+    """
+
+    response = handle(request)
+
+    assert response == """
+           HTTP/1.1 403 Forbidden\r
+           Content-Type: text/html\r
+           Content-Length: 28\r
+           \r
+           Deleting a bear is forbidden
            """
   end
 
