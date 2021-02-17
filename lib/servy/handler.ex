@@ -31,7 +31,6 @@ defmodule Servy.Handler do
 
     new_headers = Map.put(conv.resp_headers, "Content-Length", content_length)
 
-    IO.inspect(new_headers)
     %{conv | resp_headers: new_headers}
   end
 
@@ -54,6 +53,10 @@ defmodule Servy.Handler do
 
   def route(%Conv{method: "POST", path: "/bears"} = conv) do
     BearController.create(conv, conv.params)
+  end
+
+  def route(%Conv{method: "POST", path: "/api/bears"} = conv) do
+    Servy.Api.BearController.create(conv, conv.params)
   end
 
   def route(%Conv{method: "DELETE", path: "/bears" <> _id} = conv) do
