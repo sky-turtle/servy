@@ -5,6 +5,7 @@ defmodule Servy.Handler do
   @pages_path Path.expand("pages", File.cwd!())
   alias Servy.BearController
   alias Servy.Conv
+  alias Servy.VideoCam
 
   import Servy.FileHandler, only: [handle_file: 2]
   import Servy.Parser, only: [parse: 1]
@@ -32,6 +33,33 @@ defmodule Servy.Handler do
     new_headers = Map.put(conv.resp_headers, "Content-Length", content_length)
 
     %{conv | resp_headers: new_headers}
+  end
+
+  def route(%Conv{method: "GET", path: "/snapshots"} = conv) do
+    parent = self()
+
+    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-1")}) end)
+    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-2")}) end)
+    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-3")}) end)
+
+    snapshot1 =
+      receive do
+        {:result, filename} -> filename
+      end
+
+    snapshot2 =
+      receive do
+        {:result, filename} -> filename
+      end
+
+    snapshot3 =
+      receive do
+        {:result, filename} -> filename
+      end
+
+    snapshots = [snapshot1, snapshot2, snapshot3]
+
+    %{conv | status: 200, resp_body: inspect(snapshots)}
   end
 
   def route(%Conv{method: "GET", path: "/kaboom"} = _conv) do
