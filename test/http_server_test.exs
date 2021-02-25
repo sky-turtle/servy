@@ -25,4 +25,21 @@ defmodule HttpServerTest do
       end
     end
   end
+
+  test "accepts a request on a socket and sends back response using Task" do
+    spawn(HttpServer, :start, [4000])
+
+    max_concurrent_requests = 5
+
+    for _ <- 1..max_concurrent_requests do
+      spawn(fn ->
+        task = Task.async(HTTPoison, :get, ["http://localhost:4000/wildthings"])
+
+        {:ok, response} = Task.await(task)
+
+        assert response.status_code == 200
+        assert response.body == "Bears, Lions, Tigers"
+      end)
+    end
+  end
 end
