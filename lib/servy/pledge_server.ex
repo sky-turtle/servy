@@ -1,5 +1,5 @@
 defmodule Servy.PledgeServer do
-  @name :pledge_server
+  @name __MODULE__
 
   # Client interface functions
   def start do
