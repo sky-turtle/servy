@@ -27,11 +27,10 @@ defmodule Servy.PledgeServer do
   end
 
   def total_pledged() do
-    send(@name, {self(), :recent_pledges})
+    send(@name, {self(), :total_pledged})
 
     receive do
-      {:response, pledges} ->
-        Enum.reduce(pledges, 0, fn {_name, amount}, acc -> amount + acc end)
+      {:response, total} -> total
     end
   end
 
@@ -49,6 +48,15 @@ defmodule Servy.PledgeServer do
       {sender, :recent_pledges} ->
         send(sender, {:response, state})
         listen_loop(state)
+
+      {sender, :total_pledged} ->
+        total = Enum.map(state, &elem(&1, 1)) |> Enum.sum()
+        send(sender, {:response, total})
+        listen_loop(state)
+
+        # unexpected ->
+        #   IO.puts("Unexpected message: #{inspect(unexpected)}")
+        #   listen_loop(state)
     end
   end
 
