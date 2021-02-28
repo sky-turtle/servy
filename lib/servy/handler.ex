@@ -57,6 +57,12 @@ defmodule Servy.Handler do
     %{conv | status: 200, resp_body: inspect({snapshots, bigfoot_location})}
   end
 
+  def route(%Conv{method: "GET", path: "/404s"} = conv) do
+    counts = Servy.FourOhFourCounter.get_counts()
+
+    %{conv | status: 200, resp_body: inspect(counts)}
+  end
+
   def route(%Conv{method: "GET", path: "/kaboom"} = _conv) do
     raise "Kaboom"
   end

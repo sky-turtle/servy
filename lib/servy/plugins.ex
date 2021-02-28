@@ -4,6 +4,7 @@ defmodule Servy.Plugins do
 
   def track(%{status: 404, path: path} = conv) do
     if Mix.env() != :test do
+      Servy.FourOhFourCounter.bump_count(path)
       IO.puts("Warning #{path} is on the loose!")
     end
 
