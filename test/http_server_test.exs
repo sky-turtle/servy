@@ -3,9 +3,8 @@ defmodule HttpServerTest do
 
   alias Servy.HttpServer
 
-  spawn(HttpServer, :start, [4000])
-
   # test "accepts a request on a socket and sends back a response" do
+  #   spawn(HttpServer, :start, [4000])
   #   caller_pid = self()
 
   #   max_concurrent_requests = 5
@@ -27,6 +26,7 @@ defmodule HttpServerTest do
   # end
 
   test "accepts a request on a socket and sends back response using Task" do
+    spawn(HttpServer, :start, [4000])
     max_concurrent_requests = 5
 
     for _ <- 1..max_concurrent_requests do

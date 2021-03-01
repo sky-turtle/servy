@@ -1,4 +1,4 @@
-defmodule HttpServerTest do
+defmodule PledgeServerTest do
   use ExUnit.Case
 
   alias Servy.PledgeServer
