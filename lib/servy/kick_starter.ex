@@ -1,15 +1,28 @@
 defmodule Servy.KickStarter do
   use GenServer
 
+  # Client Interface
+
   def start() do
     IO.puts("Starting the kickstarter...")
     GenServer.start(__MODULE__, :ok, name: __MODULE__)
   end
 
+  def get_server() do
+    GenServer.call(__MODULE__, :get_server)
+  end
+
+  # Server Callbacks
+
   def init(:ok) do
     Process.flag(:trap_exit, true)
     server_pid = start_server()
     {:ok, server_pid}
+  end
+
+  def handle_call(:get_server, _from, state) do
+    server_pid = Process.whereis(:http_server)
+    {:reply, server_pid, state}
   end
 
   def handle_info({:EXIT, _pid, reason}, _state) do
