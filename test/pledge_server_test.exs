@@ -3,9 +3,8 @@ defmodule PledgeServerTest do
 
   alias Servy.PledgeServer
 
-  PledgeServer.start()
-
   test "PledgeServer holds 3 pledges max in cache" do
+    PledgeServer.start_link([])
     PledgeServer.create_pledge("larry", 10)
     PledgeServer.create_pledge("moe", 20)
     PledgeServer.create_pledge("curly", 30)
@@ -18,6 +17,7 @@ defmodule PledgeServerTest do
   end
 
   test "PledgeServer cache has 3 most recent pledges" do
+    PledgeServer.start_link([])
     PledgeServer.create_pledge("larry", 10)
     PledgeServer.create_pledge("moe", 20)
     PledgeServer.create_pledge("turtle", 30)
