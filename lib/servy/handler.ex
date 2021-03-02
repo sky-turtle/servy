@@ -6,7 +6,6 @@ defmodule Servy.Handler do
 
   alias Servy.BearController
   alias Servy.Conv
-  alias Servy.VideoCam
 
   import Servy.FileHandler, only: [handle_file: 2]
   import Servy.Parser, only: [parse: 1]
